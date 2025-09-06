@@ -1,0 +1,2079 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Pedidos</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos anteriores mantidos */
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --accent-color: #4cb5f5;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --gray-light: #e9ecef;
+            --text-color: #2d3748;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7f9;
+            color: var(--text-color);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            font-size: 1.5rem;
+        }
+        
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+        
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        nav ul li a:hover {
+            color: var(--accent-color);
+        }
+        
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0d486b;
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid white;
+            color: white;
+        }
+        
+        .btn-outline:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: var(--dark-color);
+        }
+        
+        .btn-warning:hover {
+            background-color: #e0a800;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+        }
+        
+        .btn-light {
+            background-color: var(--gray-light);
+            color: var(--dark-color);
+        }
+        
+        .section {
+            padding: 2rem 0;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .active {
+            display: block;
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .login-form {
+            max-width: 450px;
+            margin: 2rem auto;
+            padding: 2.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.9rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(76, 181, 245, 0.2);
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        
+        .product-card .product-image {
+            height: 200px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            overflow: hidden;
+        }
+        
+        .product-card .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .product-info {
+            padding: 1.5rem;
+        }
+        
+        .product-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+        }
+        
+        .product-price {
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .product-description {
+            color: #6c757d;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+        
+        .cart-items {
+            margin-bottom: 2rem;
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            border-radius: var(--border-radius);
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .cart-item-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .cart-item-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .cart-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .cart-total {
+            text-align: right;
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        .admin-panel {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .admin-section {
+            margin-bottom: 3rem;
+        }
+        
+        .admin-section h3 {
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid var(--gray-light);
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .order-list {
+            list-style: none;
+        }
+        
+        .order-item {
+            padding: 1.5rem;
+            border: 1px solid var(--gray-light);
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            background-color: white;
+            transition: var(--transition);
+        }
+        
+        .order-item:hover {
+            box-shadow: var(--box-shadow);
+        }
+        
+        .order-status {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-preparing {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-delivered {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .table th, .table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .table th {
+            background-color: var(--secondary-color);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .table tr:hover {
+            background-color: rgba(76, 181, 245, 0.05);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin: 0.5rem 0;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-light);
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+        
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.2rem;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .install-prompt.show {
+            display: block;
+        }
+        
+        .install-prompt p {
+            margin-bottom: 1rem;
+        }
+        
+        .install-prompt-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.8rem;
+        }
+        
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 3rem 0 1.5rem;
+            margin-top: 3rem;
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+        
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .footer-section h3 {
+            margin-bottom: 1.2rem;
+            font-size: 1.2rem;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+        }
+        
+        .footer-section ul li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-section ul li a {
+            color: #ddd;
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer-section ul li a:hover {
+            color: var(--accent-color);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid #4a4a4a;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .badge-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .badge-warning {
+            background-color: var(--warning-color);
+            color: var(--dark-color);
+        }
+        
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            borderRadius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--gray-light);
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 992px) {
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .nav-toggle {
+                display: block;
+            }
+            
+            nav {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: var(--primary-color);
+                padding: 1rem;
+                display: none;
+                box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            }
+            
+            nav.show {
+                display: block;
+            }
+            
+            nav ul {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            
+            .header-content {
+                flex-wrap: wrap;
+            }
+            
+            .user-actions {
+                width: 100%;
+                margin-top: 1rem;
+                justify-content: center;
+            }
+            
+            .cart-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .cart-item-actions {
+                width: 100%;
+                display: flex;
+                justify-content: flex-end;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 2rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .login-form {
+                padding: 1.5rem;
+            }
+            
+            .page-title {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-utensils"></i>
+                    <span>Sistema de Pedidos</span>
+                </div>
+                <button class="nav-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <nav id="main-nav">
+                    <ul>
+                        <li><a href="#" data-section="home"><i class="fas fa-home"></i> Início</a></li>
+                        <li><a href="#" data-section="products"><i class="fas fa-book-open"></i> Cardápio</a></li>
+                        <li><a href="#" data-section="cart"><i class="fas fa-shopping-cart"></i> Carrinho</a></li>
+                        <li><a href="#" data-section="orders"><i class="fas fa-list-alt"></i> Meus Pedidos</a></li>
+                        <li id="admin-nav" style="display: none;"><a href="#" data-section="admin"><i class="fas fa-cog"></i> Administração</a></li>
+                    </ul>
+                </nav>
+                <div class="user-actions" id="user-actions">
+                    <button class="btn btn-outline" id="login-btn">
+                        <i class="fas fa-sign-in-alt"></i> Entrar
+                    </button>
+                    <button class="btn btn-primary" id="register-btn" style="display: none;">
+                        <i class="fas fa-user-plus"></i> Registrar
+                    </button>
+                    <button class="btn btn-outline" id="logout-btn" style="display: none;">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Seção de Login -->
+        <section id="login" class="section active">
+            <div class="card login-form">
+                <h2 class="page-title"><i class="fas fa-sign-in-alt"></i> Login</h2>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Senha</label>
+                        <input type="password" id="password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-sign-in-alt"></i> Entrar
+                    </button>
+                </form>
+                <p style="margin-top: 1.5rem; text-align: center;">
+                    Não tem uma conta? <a href="#" id="show-register" style="color: var(--secondary-color);">Registre-se</a>
+                </p>
+            </div>
+        </section>
+
+        <!-- Seção de Registro -->
+        <section id="register" class="section">
+            <div class="card login-form">
+                <h2 class="page-title"><i class="fas fa-user-plus"></i> Registrar</h2>
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="reg-name">Nome Completo</label>
+                        <input type="text" id="reg-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-email">E-mail</label>
+                        <input type="email" id="reg-email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-password">Senha</label>
+                        <input type="password" id="reg-password" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-phone">Telefone</label>
+                        <input type="tel" id="reg-phone" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-user-plus"></i> Registrar
+                    </button>
+                </form>
+                <p style="margin-top: 1.5rem; text-align: center;">
+                    Já tem uma conta? <a href="#" id="show-login" style="color: var(--secondary-color);">Faça login</a>
+                </p>
+            </div>
+        </section>
+
+        <!-- Seção Inicial -->
+        <section id="home" class="section">
+            <h2 class="page-title"><i class="fas fa-home"></i> Bem-vindo ao Sistema de Pedidos</h2>
+            <p>Explore nosso cardápio e faça seu pedido online de forma rápida e prática!</p>
+            
+            <div class="stats-grid" id="home-stats">
+                <div class="stat-card">
+                    <i class="fas fa-users fa-2x" style="color: var(--primary-color);"></i>
+                    <div class="stat-value" id="total-users">0</div>
+                    <div class="stat-label">Clientes Cadastrados</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-utensils fa-2x" style="color: var(--primary-color);"></i>
+                    <div class="stat-value" id="total-products">0</div>
+                    <div class="stat-label">Produtos no Cardápio</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-shopping-bag fa-2x" style="color: var(--primary-color);"></i>
+                    <div class="stat-value" id="total-orders">0</div>
+                    <div class="stat-label">Pedidos Realizados</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 2rem;">
+                <h3 style="margin-bottom: 1rem; color: var(--secondary-color);">Destaques da Semana</h3>
+                <div class="products-grid" id="featured-products">
+                    <!-- Produtos em destaque serão carregados via JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Produtos -->
+        <section id="products" class="section">
+            <h2 class="page-title"><i class="fas fa-book-open"></i> Cardápio</h2>
+            <div class="products-grid" id="products-grid">
+                <!-- Produtos serão carregados via JavaScript -->
+            </div>
+        </section>
+
+        <!-- Seção do Carrinho -->
+        <section id="cart" class="section">
+            <h2 class="page-title"><i class="fas fa-shopping-cart"></i> Seu Carrinho</h2>
+            <div class="cart-items" id="cart-items">
+                <!-- Itens do carrinho serão carregados via JavaScript -->
+            </div>
+            <div class="cart-total" id="cart-total">
+                Total: R$ 0,00
+            </div>
+            <button class="btn btn-success" id="checkout-btn" style="width: 100%; padding: 1rem;">
+                <i class="fas fa-check"></i> Finalizar Pedido
+            </button>
+        </section>
+
+        <!-- Seção de Pedidos -->
+        <section id="orders" class="section">
+            <h2 class="page-title"><i class="fas fa-list-alt"></i> Meus Pedidos</h2>
+            <div id="orders-list">
+                <!-- Pedidos serão carregados via JavaScript -->
+            </div>
+        </section>
+
+        <!-- Seção de Administração -->
+        <section id="admin" class="section">
+            <h2 class="page-title"><i class="fas fa-cog"></i> Painel de Administração</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-shopping-bag fa-2x" style="color: var(--primary-color);"></i>
+                    <div class="stat-value" id="admin-total-orders">0</div>
+                    <div class="stat-label">Total de Pedidos</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-clock fa-2x" style="color: var(--warning-color);"></i>
+                    <div class="stat-value" id="admin-pending-orders">0</div>
+                    <div class="stat-label">Pedidos Pendentes</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-users fa-2x" style="color: var(--primary-color);"></i>
+                    <div class="stat-value" id="admin-total-users">0</div>
+                    <div class="stat-label">Usuários Cadastrados</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-dollar-sign fa-2x" style="color: var(--success-color);"></i>
+                    <div class="stat-value" id="admin-total-revenue">R$ 0</div>
+                    <div class="stat-label">Faturamento Total</div>
+                </div>
+            </div>
+            
+            <div class="admin-panel">
+                <div class="admin-section">
+                    <h3><i class="fas fa-utensils"></i> Gerenciar Produtos</h3>
+                    <button class="btn btn-primary" id="add-product-btn">
+                        <i class="fas fa-plus"></i> Adicionar Produto
+                    </button>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Imagem</th>
+                                    <th>Nome</th>
+                                    <th>Preço</th>
+                                    <th>Categoria</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-products-list">
+                                <!-- Produtos admin serão carregados via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="admin-section">
+                    <h3><i class="fas fa-list-alt"></i> Gerenciar Pedidos</h3>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nº Pedido</th>
+                                    <th>Cliente</th>
+                                    <th>Itens</th>
+                                    <th>Total</th>
+                                    <th>Data</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-orders-list">
+                                <!-- Pedidos admin serão carregados via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="admin-section">
+                    <h3><i class="fas fa-users"></i> Gerenciar Usuários</h3>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>E-mail</th>
+                                    <th>Telefone</th>
+                                    <th>Pedidos</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-users-list">
+                                <!-- Usuários admin serão carregados via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal para adicionar/editar produtos -->
+    <div class="modal" id="product-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="product-modal-title">Adicionar Produto</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="product-form">
+                <input type="hidden" id="product-id">
+                <div class="form-group">
+                    <label for="product-name">Nome do Produto</label>
+                    <input type="text" id="product-name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="product-price">Preço (R$)</label>
+                    <input type="number" id="product-price" class="form-control" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="product-category">Categoria</label>
+                    <select id="product-category" class="form-control" required>
+                        <option value="">Selecione uma categoria</option>
+                        <option value="Pizza">Pizza</option>
+                        <option value="Hambúrguer">Hambúrguer</option>
+                        <option value="Bebida">Bebida</option>
+                        <option value="Sobremesa">Sobremesa</option>
+                        <option value="Acompanhamento">Acompanhamento</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="product-description">Descrição</label>
+                    <textarea id="product-description" class="form-control" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="product-image">URL da Imagem</label>
+                    <input type="text" id="product-image" class="form-control" placeholder="Cole a URL da imagem aqui">
+                </div>
+                <div class="form-group">
+                    <label for="product-status">Status</label>
+                    <select id="product-status" class="form-control" required>
+                        <option value="available">Disponível</option>
+                        <option value="unavailable">Indisponível</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-save"></i> Salvar Produto
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para visualizar pedido -->
+    <div class="modal" id="order-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Detalhes do Pedido #<span id="order-modal-id"></span></h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div id="order-modal-content">
+                <!-- Conteúdo do modal de pedido será preenchido via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <div class="install-prompt" id="install-prompt">
+        <p>Instale nosso aplicativo para uma experiência melhor!</p>
+        <div class="install-prompt-actions">
+            <button class="btn btn-outline" id="install-cancel">Agora não</button>
+            <button class="btn btn-primary" id="install-btn">Instalar</button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Sistema de Pedidos</h3>
+                    <p>Seu sistema de pedidos online favorito. Rápido, prático and eficiente.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Links Rápidos</h3>
+                    <ul>
+                        <li><a href="#" data-section="home"><i class="fas fa-home"></i> Início</a></li>
+                        <li><a href="#" data-section="products"><i class="fas fa-book-open"></i> Cardápio</a></li>
+                        <li><a href="#" data-section="cart"><i class="fas fa-shopping-cart"></i> Carrinho</a></li>
+                        <li><a href="#" data-section="orders"><i class="fas fa-list-alt"></i> Meus Pedidos</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Contato</h3>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> Email: contato@sistemadepedidos.com</li>
+                        <li><i class="fas fa-phone"></i> Telefone: (11) 99999-9999</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Endereço: Rua Exemplo, 123 - São Paulo, SP</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 Sistema de Pedidos. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Estrutura de dados aprimorada para gerenciamento por usuário
+        const APP_PREFIX = 'orderSystem_';
+        
+        // Funções para gerenciar o localStorage com prefixo
+        function getLocalStorage(key) {
+            const data = localStorage.getItem(APP_PREFIX + key);
+            return data ? JSON.parse(data) : null;
+        }
+        
+        function setLocalStorage(key, value) {
+            localStorage.setItem(APP_PREFIX + key, JSON.stringify(value));
+        }
+        
+        // Dados iniciais (simulando um banco de dados)
+        let products = getLocalStorage('products') || [
+            { 
+                id: 1, 
+                name: 'Pizza Margherita', 
+                price: 35.90, 
+                image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+                category: 'Pizza',
+                description: 'Molho de tomate, mussarela, manjericão fresco e azeite',
+                status: 'available'
+            },
+            { 
+                id: 2, 
+                name: 'Hambúrguer Clássico', 
+                price: 22.50, 
+                image: 'https://images.unsplash.com/photo-1553979459-d2229ba7433b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+                category: 'Hambúrguer',
+                description: 'Pão, hambúrguer 180g, queijo, alface, tomate e molho especial',
+                status: 'available'
+            },
+            { 
+                id: 3, 
+                name: 'Batata Frita', 
+                price: 12.00, 
+                image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+                category: 'Acompanhamento',
+                description: 'Porção de batata frita crocante com tempero especial',
+                status: 'available'
+            },
+            { 
+                id: 4, 
+                name: 'Refrigerante', 
+                price: 8.00, 
+                image: 'https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8 MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+                category: 'Bebida',
+                description: 'Lata 350ml - Escolha o sabor: Coca-Cola, Guaraná ou Fanta',
+                status: 'available'
+            },
+            { 
+                id: 5, 
+                name: 'Suco Natural', 
+                price: 10.00, 
+                image: 'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+                category: 'Bebida',
+                description: 'Copo 500ml - Laranja, Limão, Maracujá ou Abacaxi com Hortelã',
+                status: 'available'
+            },
+            { 
+                id: 6, 
+                name: 'Salada Caesar', 
+                price: 18.50, 
+                image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+                category: 'Salada',
+                description: 'Alface romana, croutons, parmesão e molho caesar',
+                status: 'available'
+            },
+            { 
+                id: 7, 
+                name: 'Brownie com Sorvete', 
+                price: 16.90, 
+                image: 'https://images.unsplash.com/photo-1564352969906-8b7f46ba4b8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+                category: 'Sobremesa',
+                description: 'Brownie de chocolate com sorvete de creme e calda de chocolate',
+                status: 'available'
+            },
+            { 
+                id: 8, 
+                name: 'Pizza Calabresa', 
+                price: 38.90, 
+                image: 'https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+                category: 'Pizza',
+                description: 'Molho de tomate, mussarela, calabresa fatiada e cebola',
+                status: 'available'
+            }
+        ];
+        
+        let users = getLocalStorage('users') || [];
+        let orders = getLocalStorage('orders') || [];
+        let currentUser = getLocalStorage('currentUser') || null;
+        
+        // Carrinho por usuário - esta é a chave para resolver o problema
+        let userCart = getLocalStorage(currentUser ? `cart_${currentUser.id}` : 'cart') || [];
+        
+        // Elementos DOM
+        const sections = document.querySelectorAll('.section');
+        const navLinks = document.querySelectorAll('nav a');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const showLoginLink = document.getElementById('show-login');
+        const showRegisterLink = document.getElementById('show-register');
+        const productsGrid = document.getElementById('products-grid');
+        const featuredProducts = document.getElementById('featured-products');
+        const cartItems = document.getElementById('cart-items');
+        const cartTotal = document.getElementById('cart-total');
+        const checkoutBtn = document.getElementById('checkout-btn');
+        const ordersList = document.getElementById('orders-list');
+        const adminNav = document.getElementById('admin-nav');
+        const adminProductsList = document.getElementById('admin-products-list');
+        const adminOrdersList = document.getElementById('admin-orders-list');
+        const adminUsersList = document.getElementById('admin-users-list');
+        const addProductBtn = document.getElementById('add-product-btn');
+        const installPrompt = document.getElementById('install-prompt');
+        const installBtn = document.getElementById('install-btn');
+        const installCancel = document.getElementById('install-cancel');
+        const navToggle = document.querySelector('.nav-toggle');
+        const mainNav = document.getElementById('main-nav');
+        const productModal = document.getElementById('product-modal');
+        const productForm = document.getElementById('product-form');
+        const productModalTitle = document.getElementById('product-modal-title');
+        const orderModal = document.getElementById('order-modal');
+        const orderModalId = document.getElementById('order-modal-id');
+        const orderModalContent = document.getElementById('order-modal-content');
+        const closeModalButtons = document.querySelectorAll('.close-modal');
+        
+        // Elementos de estatísticas
+        const totalUsers = document.getElementById('total-users');
+        const totalProducts = document.getElementById('total-products');
+        const totalOrders = document.getElementById('total-orders');
+        const adminTotalOrders = document.getElementById('admin-total-orders');
+        const adminPendingOrders = document.getElementById('admin-pending-orders');
+        const adminTotalUsers = document.getElementById('admin-total-users');
+        const adminTotalRevenue = document.getElementById('admin-total-revenue');
+        
+        // Variáveis para PWA
+        let deferredPrompt;
+        
+        // Inicialização
+        function init() {
+            updateLocalStorage();
+            renderProducts();
+            renderFeaturedProducts();
+            updateCart();
+            updateUserInterface();
+            updateStats();
+            
+            // Verificar se é possível instalar o PWA
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                setTimeout(() => {
+                    installPrompt.classList.add('show');
+                }, 3000);
+            });
+            
+            // Verificar se já está instalado
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                console.log('App já instalado');
+            }
+        }
+        
+        // Atualizar localStorage
+        function updateLocalStorage() {
+            setLocalStorage('products', products);
+            setLocalStorage('users', users);
+            setLocalStorage('orders', orders);
+            setLocalStorage('currentUser', currentUser);
+            
+            // Salvar carrinho com chave específica para o usuário
+            if (currentUser) {
+                setLocalStorage(`cart_${currentUser.id}`, userCart);
+            } else {
+                setLocalStorage('cart', userCart);
+            }
+        }
+        
+        // Atualizar estatísticas
+        function updateStats() {
+            // Estatísticas da página inicial
+            totalUsers.textContent = users.length;
+            totalProducts.textContent = products.length;
+            totalOrders.textContent = orders.length;
+            
+            // Estatísticas do painel admin
+            adminTotalOrders.textContent = orders.length;
+            adminPendingOrders.textContent = orders.filter(order => order.status === 'pending').length;
+            adminTotalUsers.textContent = users.length;
+            
+            // Calcular faturamento total
+            const revenue = orders.reduce((total, order) => total + order.total, 0);
+            adminTotalRevenue.textContent = `R$ ${revenue.toFixed(2)}`;
+        }
+        
+        // Atualizar interface com base no usuário
+        function updateUserInterface() {
+            if (currentUser) {
+                loginBtn.style.display = 'none';
+                registerBtn.style.display = 'none';
+                logoutBtn.style.display = 'block';
+                
+                // Verificar se é admin
+                if (currentUser.email === 'admin@admin.com') {
+                    adminNav.style.display = 'block';
+                } else {
+                    adminNav.style.display = 'none';
+                }
+                
+                showSection('home');
+            } else {
+                loginBtn.style.display = 'block';
+                registerBtn.style.display = 'block';
+                logoutBtn.style.display = 'none';
+                adminNav.style.display = 'none';
+                showSection('login');
+            }
+        }
+        
+        // Mostrar seção específica
+        function showSection(sectionId) {
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Rolar para o topo
+            window.scrollTo(0, 0);
+            
+            // Executar ações específicas para cada seção
+            if (sectionId === 'orders' && currentUser) {
+                renderUserOrders();
+            } else if (sectionId === 'admin' && currentUser && currentUser.email === 'admin@admin.com') {
+                renderAdminProducts();
+                renderAdminOrders();
+                renderAdminUsers();
+                updateStats();
+            } else if (sectionId === 'home') {
+                updateStats();
+            }
+        }
+        
+        // Renderizar produtos em destaque
+        function renderFeaturedProducts() {
+            // Selecionar aleatoriamente 4 produtos para exibir em destaque
+            const shuffled = [...products].sort(() => 0.5 - Math.random());
+            const selected = shuffled.slice(0, 4);
+            
+            featuredProducts.innerHTML = '';
+            selected.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card card';
+                productCard.innerHTML = `
+                    <div class="product-image">
+                        ${product.image ? `<img src="${product.image}" alt="${product.name}">` : 'Imagem'}
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">${product.name}</h3>
+                        <p class="product-description">${product.description || ''}</p>
+                        <p class="product-price">R$ ${product.price.toFixed(2)}</p>
+                        <button class="btn btn-primary add-to-cart" data-id="${product.id}">
+                            <i class="fas fa-cart-plus"></i> Adicionar
+                        </button>
+                    </div>
+                `;
+                featuredProducts.appendChild(productCard);
+            });
+            
+            // Adicionar event listeners aos botões
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const productId = parseInt(e.target.closest('.add-to-cart').getAttribute('data-id'));
+                    addToCart(productId);
+                });
+            });
+        }
+        
+        // Renderizar produtos
+        function renderProducts() {
+            productsGrid.innerHTML = '';
+            products.forEach(product => {
+                if (product.status !== 'available') return;
+                
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card card';
+                productCard.innerHTML = `
+                    <div class="product-image">
+                        ${product.image ? `<img src="${product.image}" alt="${product.name}">` : 'Imagem'}
+                    </div>
+                    <div class="product-info">
+                        <span class="badge badge-primary">${product.category}</span>
+                        <h3 class="product-title">${product.name}</h3>
+                        <p class="product-description">${product.description || ''}</p>
+                        <p class="product-price">R$ ${product.price.toFixed(2)}</p>
+                        <button class="btn btn-primary add-to-cart" data-id="${product.id}">
+                            <i class="fas fa-cart-plus"></i> Adicionar
+                        </button>
+                    </div>
+                `;
+                productsGrid.appendChild(productCard);
+            });
+            
+            // Adicionar event listeners aos botões
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const productId = parseInt(e.target.closest('.add-to-cart').getAttribute('data-id'));
+                    addToCart(productId);
+                });
+            });
+        }
+        
+        // Adicionar produto ao carrinho
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                const existingItem = userCart.find(item => item.productId === productId);
+                if (existingItem) {
+                    existingItem.quantity += 1;
+                } else {
+                    userCart.push({
+                        productId: productId,
+                        name: product.name,
+                        price: product.price,
+                        quantity: 1,
+                        image: product.image
+                    });
+                }
+                updateLocalStorage();
+                updateCart();
+                
+                // Feedback visual
+                const button = document.querySelector(`.add-to-cart[data-id="${productId}"]`);
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> Adicionado';
+                button.classList.add('btn-success');
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.classList.remove('btn-success');
+                }, 1500);
+            }
+        }
+        
+        // Atualizar carrinho
+        function updateCart() {
+            cartItems.innerHTML = '';
+            let total = 0;
+            
+            if (userCart.length === 0) {
+                cartItems.innerHTML = '<p class="text-center">Seu carrinho está vazio.</p>';
+                checkoutBtn.disabled = true;
+            } else {
+                checkoutBtn.disabled = false;
+                userCart.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    total += itemTotal;
+                    
+                    const cartItem = document.createElement('div');
+                    cartItem.className = 'cart-item card';
+                    cartItem.innerHTML = `
+                        <div class="cart-item-info">
+                            <div class="cart-item-image">
+                                ${item.image ? `<img src="${item.image}" alt="${item.name}">` : 'Imagem'}
+                            </div>
+                            <div>
+                                <h4>${item.name}</h4>
+                                <p>R$ ${item.price.toFixed(2)}</p>
+                                <div class="quantity-control">
+                                    <button class="quantity-btn decrease-quantity" data-id="${item.productId}">-</button>
+                                    <span>${item.quantity}</span>
+                                    <button class="quantity-btn increase-quantity" data-id="${item.productId}">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cart-item-actions">
+                            <p><strong>R$ ${itemTotal.toFixed(2)}</strong></p>
+                            <button class="btn btn-danger btn-sm remove-from-cart" data-id="${item.productId}">
+                                <i class="fas fa-trash"></i> Remover
+                            </button>
+                        </div>
+                    `;
+                    cartItems.appendChild(cartItem);
+                });
+                
+                // Adicionar event listeners aos botões
+                document.querySelectorAll('.remove-from-cart').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const productId = parseInt(e.target.closest('.remove-from-cart').getAttribute('data-id'));
+                        removeFromCart(productId);
+                    });
+                });
+                
+                document.querySelectorAll('.increase-quantity').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const productId = parseInt(e.target.closest('.increase-quantity').getAttribute('data-id'));
+                        updateQuantity(productId, 1);
+                    });
+                });
+                
+                document.querySelectorAll('.decrease-quantity').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const productId = parseInt(e.target.closest('.decrease-quantity').getAttribute('data-id'));
+                        updateQuantity(productId, -1);
+                    });
+                });
+            }
+            
+            cartTotal.textContent = `Total: R$ ${total.toFixed(2)}`;
+        }
+        
+        // Atualizar quantidade do item no carrinho
+        function updateQuantity(productId, change) {
+            const item = userCart.find(item => item.productId === productId);
+            if (item) {
+                item.quantity += change;
+                
+                // Remover item se a quantidade for 0 ou menos
+                if (item.quantity <= 0) {
+                    removeFromCart(productId);
+                } else {
+                    updateLocalStorage();
+                    updateCart();
+                }
+            }
+        }
+        
+        // Remover produto do carrinho
+        function removeFromCart(productId) {
+            if (confirm('Tem certeza que deseja remover este item do carrinho?')) {
+                const itemIndex = userCart.findIndex(item => item.productId === productId);
+                if (itemIndex !== -1) {
+                    userCart.splice(itemIndex, 1);
+                    updateLocalStorage();
+                    updateCart();
+                }
+            }
+        }
+        
+        // Finalizar pedido
+        function checkout() {
+            if (userCart.length === 0) {
+                alert('Seu carrinho está vazio!');
+                return;
+            }
+            
+            if (!currentUser) {
+                alert('Você precisa estar logado para finalizar o pedido!');
+                showSection('login');
+                return;
+            }
+            
+            const total = userCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const newOrder = {
+                id: orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 : 1,
+                userId: currentUser.id,
+                userName: currentUser.name,
+                userPhone: currentUser.phone,
+                items: [...userCart],
+                total: total,
+                status: 'pending',
+                date: new Date().toISOString(),
+                address: currentUser.address || 'Retirar no balcão'
+            };
+            
+            orders.push(newOrder);
+            userCart = [];
+            updateLocalStorage();
+            updateCart();
+            updateStats();
+            alert('Pedido realizado com sucesso! Número do pedido: ' + newOrder.id);
+            showSection('orders');
+        }
+        
+        // Renderizar pedidos do usuário
+        function renderUserOrders() {
+            if (!currentUser) return;
+            
+            const userOrders = orders.filter(order => order.userId === currentUser.id)
+                                    .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (userOrders.length === 0) {
+                ordersList.innerHTML = '<p class="text-center">Você não fez nenhum pedido ainda.</p>';
+            } else {
+                ordersList.innerHTML = '';
+                userOrders.forEach(order => {
+                    const orderElement = document.createElement('div');
+                    orderElement.className = 'order-item card';
+                    orderElement.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h3>Pedido #${order.id}</h3>
+                            <span class="order-status status-${order.status}">${getStatusText(order.status)}</span>
+                        </div>
+                        <p><strong>Data:</strong> ${new Date(order.date).toLocaleDateString()} ${new Date(order.date).toLocaleTimeString()}</p>
+                        <p><strong>Total:</strong> R$ ${order.total.toFixed(2)}</p>
+                        <p><strong>Endereço de entrega:</strong> ${order.address}</p>
+                        <h4 style="margin-top: 1rem;">Itens:</h4>
+                        <ul>
+                            ${order.items.map(item => `<li>${item.quantity}x ${item.name} - R$ ${item.price.toFixed(2)}</li>`).join('')}
+                        </ul>
+                        ${order.status === 'pending' ? `
+                            <div style="margin-top: 1rem;">
+                                <button class="btn btn-danger btn-sm cancel-order" data-id="${order.id}">
+                                    <i class="fas fa-times"></i> Cancelar Pedido
+                                </button>
+                            </div>
+                        ` : ''}
+                    `;
+                    ordersList.appendChild(orderElement);
+                });
+                
+                // Adicionar event listeners aos botões de cancelamento
+                document.querySelectorAll('.cancel-order').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const orderId = parseInt(e.target.closest('.cancel-order').getAttribute('data-id'));
+                        cancelOrder(orderId);
+                    });
+                });
+            }
+        }
+        
+        // Cancelar pedido
+        function cancelOrder(orderId) {
+            if (confirm('Tem certeza que deseja cancelar este pedido?')) {
+                const order = orders.find(o => o.id === orderId);
+                if (order) {
+                    order.status = 'cancelled';
+                    updateLocalStorage();
+                    renderUserOrders();
+                    alert('Pedido cancelado com sucesso!');
+                }
+            }
+        }
+        
+        // Obter texto do status
+        function getStatusText(status) {
+            switch(status) {
+                case 'pending': return 'Pendente';
+                case 'preparing': return 'Em preparação';
+                case 'delivered': return 'Entregue';
+                case 'cancelled': return 'Cancelado';
+                default: return status;
+            }
+        }
+        
+        // Renderizar produtos no painel admin
+        function renderAdminProducts() {
+            adminProductsList.innerHTML = '';
+            products.forEach(product => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        ${product.image ? 
+                            `<img src="${product.image}" alt="${product.name}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">` : 
+                            'Sem imagem'
+                        }
+                    </td>
+                    <td>${product.name}</td>
+                    <td>R$ ${product.price.toFixed(2)}</td>
+                    <td>${product.category}</td>
+                    <td>
+                        <span class="badge ${product.status === 'available' ? 'badge-success' : 'badge-warning'}">
+                            ${product.status === 'available' ? 'Disponível' : 'Indisponível'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-primary btn-sm edit-product" data-id="${product.id}">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button class="btn btn-danger btn-sm delete-product" data-id="${product.id}">
+                            <i class="fas fa-trash"></i> Excluir
+                        </button>
+                    </td>
+                `;
+                adminProductsList.appendChild(row);
+            });
+            
+            // Adicionar event listeners aos botões
+            document.querySelectorAll('.edit-product').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const productId = parseInt(e.target.closest('.edit-product').getAttribute('data-id'));
+                    openEditProductModal(productId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-product').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const productId = parseInt(e.target.closest('.delete-product').getAttribute('data-id'));
+                    deleteProduct(productId);
+                });
+            });
+        }
+        
+        // Renderizar pedidos no painel admin
+        function renderAdminOrders() {
+            adminOrdersList.innerHTML = '';
+            // Ordenar pedidos do mais recente para o mais antigo
+            const sortedOrders = [...orders].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            sortedOrders.forEach(order => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>#${order.id}</td>
+                    <td>${order.userName}</td>
+                    <td>${order.items.length} itens</td>
+                    <td>R$ ${order.total.toFixed(2)}</td>
+                    <td>${new Date(order.date).toLocaleDateString()}</td>
+                    <td>
+                        <span class="order-status status-${order.status}">${getStatusText(order.status)}</span>
+                    </td>
+                    <td>
+                        <button class="btn btn-primary btn-sm view-order" data-id="${order.id}">
+                            <i class="fas fa-eye"></i> Ver
+                        </button>
+                        <button class="btn btn-success btn-sm update-order" data-id="${order.id}">
+                            <i class="fas fa-sync"></i> Status
+                        </button>
+                        <button class="btn btn-danger btn-sm delete-order" data-id="${order.id}">
+                            <i class="fas fa-trash"></i> Excluir
+                        </button>
+                    </td>
+                `;
+                adminOrdersList.appendChild(row);
+            });
+            
+            // Adicionar event listeners aos botões
+            document.querySelectorAll('.view-order').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const orderId = parseInt(e.target.closest('.view-order').getAttribute('data-id'));
+                    viewOrder(orderId);
+                });
+            });
+            
+            document.querySelectorAll('.update-order').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const orderId = parseInt(e.target.closest('.update-order').getAttribute('data-id'));
+                    updateOrderStatus(orderId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-order').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const orderId = parseInt(e.target.closest('.delete-order').getAttribute('data-id'));
+                    deleteOrder(orderId);
+                });
+            });
+        }
+        
+        // Renderizar usuários no painel admin
+        function renderAdminUsers() {
+            adminUsersList.innerHTML = '';
+            users.forEach(user => {
+                const userOrders = orders.filter(order => order.userId === user.id);
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.phone || 'Não informado'}</td>
+                    <td>${userOrders.length}</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm view-user" data-id="${user.id}">
+                            <i class="fas fa-eye"></i> Detalhes
+                        </button>
+                    </td>
+                `;
+                adminUsersList.appendChild(row);
+            });
+            
+            // Adicionar event listeners aos botões
+            document.querySelectorAll('.view-user').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const userId = parseInt(e.target.closest('.view-user').getAttribute('data-id'));
+                    viewUserDetails(userId);
+                });
+            });
+        }
+        
+        // Visualizar detalhes do pedido
+        function viewOrder(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                orderModalId.textContent = order.id;
+                orderModalContent.innerHTML = `
+                    <p><strong>Cliente:</strong> ${order.userName}</p>
+                    <p><strong>Telefone:</strong> ${order.userPhone || 'Não informado'}</p>
+                    <p><strong>Data:</strong> ${new Date(order.date).toLocaleDateString()} ${new Date(order.date).toLocaleTimeString()}</p>
+                    <p><strong>Status:</strong> <span class="order-status status-${order.status}">${getStatusText(order.status)}</span></p>
+                    <p><strong>Endereço:</strong> ${order.address}</p>
+                    <p><strong>Total:</strong> R$ ${order.total.toFixed(2)}</p>
+                    
+                    <h4 style="margin: 1.5rem 0 0.5rem;">Itens do Pedido:</h4>
+                    <ul>
+                        ${order.items.map(item => `
+                            <li style="margin-bottom: 0.5rem;">
+                                ${item.quantity}x ${item.name} - R$ ${item.price.toFixed(2)} cada
+                                <br><strong>Subtotal: R$ ${(item.quantity * item.price).toFixed(2)}</strong>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                orderModal.classList.add('show');
+            }
+        }
+        
+        // Visualizar detalhes do usuário
+        function viewUserDetails(userId) {
+            const user = users.find(u => u.id === userId);
+            if (user) {
+                const userOrders = orders.filter(order => order.userId === user.id);
+                
+                orderModalId.textContent = `Usuário #${user.id}`;
+                orderModalContent.innerHTML = `
+                    <p><strong>Nome:</strong> ${user.name}</p>
+                    <p><strong>E-mail:</strong> ${user.email}</p>
+                    <p><strong>Telefone:</strong> ${user.phone || 'Não informado'}</p>
+                    <p><strong>Total de Pedidos:</strong> ${userOrders.length}</p>
+                    
+                    ${userOrders.length > 0 ? `
+                        <h4 style="margin: 1.5rem 0 0.5rem;">Pedidos Realizados:</h4>
+                        <ul>
+                            ${userOrders.map(order => `
+                                <li style="margin-bottom: 0.8rem;">
+                                    <strong>Pedido #${order.id}</strong> - ${new Date(order.date).toLocaleDateString()}
+                                    <br>Status: <span class="order-status status-${order.status}">${getStatusText(order.status)}</span>
+                                    <br>Total: R$ ${order.total.toFixed(2)}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    ` : ''}
+                `;
+                orderModal.classList.add('show');
+            }
+        }
+        
+        // Abrir modal para editar produto
+        function openEditProductModal(productId) {
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                productModalTitle.textContent = 'Editar Produto';
+                document.getElementById('product-id').value = product.id;
+                document.getElementById('product-name').value = product.name;
+                document.getElementById('product-price').value = product.price;
+                document.getElementById('product-category').value = product.category;
+                document.getElementById('product-description').value = product.description || '';
+                document.getElementById('product-image').value = product.image || '';
+                document.getElementById('product-status').value = product.status;
+                
+                productModal.classList.add('show');
+            }
+        }
+        
+        // Abrir modal para adicionar produto
+        function openAddProductModal() {
+            productModalTitle.textContent = 'Adicionar Produto';
+            productForm.reset();
+            document.getElementById('product-id').value = '';
+            document.getElementById('product-status').value = 'available';
+            
+            productModal.classList.add('show');
+        }
+        
+        // Salvar produto (adicionar ou editar)
+        function saveProduct(e) {
+            e.preventDefault();
+            
+            const productId = document.getElementById('product-id').value;
+            const name = document.getElementById('product-name').value;
+            const price = parseFloat(document.getElementById('product-price').value);
+            const category = document.getElementById('product-category').value;
+            const description = document.getElementById('product-description').value;
+            const image = document.getElementById('product-image').value;
+            const status = document.getElementById('product-status').value;
+            
+            if (productId) {
+                // Editar produto existente
+                const product = products.find(p => p.id === parseInt(productId));
+                if (product) {
+                    product.name = name;
+                    product.price = price;
+                    product.category = category;
+                    product.description = description;
+                    product.image = image;
+                    product.status = status;
+                }
+            } else {
+                // Adicionar novo produto
+                const newProduct = {
+                    id: products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1,
+                    name: name,
+                    price: price,
+                    category: category,
+                    description: description,
+                    image: image,
+                    status: status
+                };
+                products.push(newProduct);
+            }
+            
+            updateLocalStorage();
+            renderProducts();
+            renderAdminProducts();
+            renderFeaturedProducts();
+            productModal.classList.remove('show');
+            
+            alert('Produto salvo com sucesso!');
+        }
+        
+        // Excluir produto
+        function deleteProduct(productId) {
+            if (confirm('Tem certeza que deseja excluir este produto?')) {
+                products = products.filter(p => p.id !== productId);
+                updateLocalStorage();
+                renderProducts();
+                renderAdminProducts();
+                renderFeaturedProducts();
+                alert('Produto excluído com sucesso!');
+            }
+        }
+        
+        // Atualizar status do pedido
+        function updateOrderStatus(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                const newStatus = prompt(`Alterar status do pedido #${orderId} (pending, preparing, delivered, cancelled):`, order.status);
+                if (newStatus && ['pending', 'preparing', 'delivered', 'cancelled'].includes(newStatus)) {
+                    order.status = newStatus;
+                    updateLocalStorage();
+                    renderAdminOrders();
+                    alert('Status do pedido atualizado!');
+                }
+            }
+        }
+        
+        // Excluir pedido
+        function deleteOrder(orderId) {
+            if (confirm('Tem certeza que deseja excluir este pedido? Esta ação não pode ser desfeita.')) {
+                orders = orders.filter(o => o.id !== orderId);
+                updateLocalStorage();
+                renderAdminOrders();
+                updateStats();
+                alert('Pedido excluído com sucesso!');
+            }
+        }
+        
+        // Event Listeners
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Verificar credenciais de admin
+            if (email === 'admin@admin.com' && password === 'admin1987') {
+                currentUser = {
+                    id: 0,
+                    name: 'Administrador',
+                    email: email,
+                    isAdmin: true
+                };
+                // Carregar carrinho específico para este usuário
+                userCart = getLocalStorage(`cart_${currentUser.id}`) || [];
+                updateLocalStorage();
+                updateUserInterface();
+                alert('Login administrativo realizado com sucesso!');
+                return;
+            }
+            
+            // Verificar usuários comuns
+            const user = users.find(u => u.email === email && u.password === password);
+            if (user) {
+                currentUser = user;
+                // Carregar carrinho específico para este usuário
+                userCart = getLocalStorage(`cart_${currentUser.id}`) || [];
+                updateLocalStorage();
+                updateUserInterface();
+                alert('Login realizado com sucesso!');
+            } else {
+                alert('E-mail ou senha incorretos!');
+            }
+        });
+        
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const phone = document.getElementById('reg-phone').value;
+            
+            // Verificar se o email já existe
+            if (users.some(u => u.email === email)) {
+                alert('Este e-mail já está em uso!');
+                return;
+            }
+            
+            const newUser = {
+                id: users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1,
+                name: name,
+                email: email,
+                password: password,
+                phone: phone
+            };
+            
+            users.push(newUser);
+            currentUser = newUser;
+            // Inicializar carrinho vazio para o novo usuário
+            userCart = [];
+            updateLocalStorage();
+            updateUserInterface();
+            updateStats();
+            alert('Conta criada com sucesso! Você está logado.');
+        });
+        
+        logoutBtn.addEventListener('click', () => {
+            currentUser = null;
+            // Limpar carrinho ao fazer logout
+            userCart = [];
+            updateLocalStorage();
+            updateUserInterface();
+            alert('Logout realizado com sucesso!');
+        });
+        
+        showLoginLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('login');
+        });
+        
+        showRegisterLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('register');
+        });
+        
+        checkoutBtn.addEventListener('click', checkout);
+        
+        addProductBtn.addEventListener('click', openAddProductModal);
+        
+        productForm.addEventListener('submit', saveProduct);
+        
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = e.target.getAttribute('data-section');
+                showSection(sectionId);
+            });
+        });
+        
+        // Footer links
+        document.querySelectorAll('.footer-section a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = e.target.getAttribute('data-section');
+                showSection(sectionId);
+            });
+        });
+        
+        // Fechar modais
+        closeModalButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                productModal.classList.remove('show');
+                orderModal.classList.remove('show');
+            });
+        });
+        
+        // Fechar modal clicando fora dele
+        window.addEventListener('click', (e) => {
+            if (e.target === productModal) {
+                productModal.classList.remove('show');
+            }
+            if (e.target === orderModal) {
+                orderModal.classList.remove('show');
+            }
+        });
+        
+        // Instalar PWA
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installPrompt.classList.remove('show');
+                }
+                deferredPrompt = null;
+            }
+        });
+        
+        installCancel.addEventListener('click', () => {
+            installPrompt.classList.remove('show');
+        });
+        
+        // Menu toggle para mobile
+        navToggle.addEventListener('click', () => {
+            mainNav.classList.toggle('show');
+        });
+        
+        // Inicializar aplicação
+        init();
+    </script>
+</body>
+</html>
