@@ -7,6 +7,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Estilos anteriores mantidos */
         :root {
             --primary-color: #4a6fa5;
             --secondary-color: #166088;
@@ -631,7 +632,7 @@
         .quantity-btn {
             width: 30px;
             height: 30px;
-            border-radius: 50%;
+            borderRadius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1049,7 +1050,7 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h3>Sistema de Pedidos</h3>
-                    <p>Seu sistema de pedidos online favorito. Rápido, prático e eficiente.</p>
+                    <p>Seu sistema de pedidos online favorito. Rápido, prático and eficiente.</p>
                 </div>
                 <div class="footer-section">
                     <h3>Links Rápidos</h3>
@@ -1076,8 +1077,21 @@
     </footer>
 
     <script>
+        // Estrutura de dados aprimorada para gerenciamento por usuário
+        const APP_PREFIX = 'orderSystem_';
+        
+        // Funções para gerenciar o localStorage com prefixo
+        function getLocalStorage(key) {
+            const data = localStorage.getItem(APP_PREFIX + key);
+            return data ? JSON.parse(data) : null;
+        }
+        
+        function setLocalStorage(key, value) {
+            localStorage.setItem(APP_PREFIX + key, JSON.stringify(value));
+        }
+        
         // Dados iniciais (simulando um banco de dados)
-        let products = JSON.parse(localStorage.getItem('products')) || [
+        let products = getLocalStorage('products') || [
             { 
                 id: 1, 
                 name: 'Pizza Margherita', 
@@ -1109,7 +1123,7 @@
                 id: 4, 
                 name: 'Refrigerante', 
                 price: 8.00, 
-                image: 'https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
+                image: 'https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8 MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80',
                 category: 'Bebida',
                 description: 'Lata 350ml - Escolha o sabor: Coca-Cola, Guaraná ou Fanta',
                 status: 'available'
@@ -1152,10 +1166,12 @@
             }
         ];
         
-        let users = JSON.parse(localStorage.getItem('users')) || [];
-        let orders = JSON.parse(localStorage.getItem('orders')) || [];
-        let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let users = getLocalStorage('users') || [];
+        let orders = getLocalStorage('orders') || [];
+        let currentUser = getLocalStorage('currentUser') || null;
+        
+        // Carrinho por usuário - esta é a chave para resolver o problema
+        let userCart = getLocalStorage(currentUser ? `cart_${currentUser.id}` : 'cart') || [];
         
         // Elementos DOM
         const sections = document.querySelectorAll('.section');
@@ -1229,11 +1245,17 @@
         
         // Atualizar localStorage
         function updateLocalStorage() {
-            localStorage.setItem('products', JSON.stringify(products));
-            localStorage.setItem('users', JSON.stringify(users));
-            localStorage.setItem('orders', JSON.stringify(orders));
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            localStorage.setItem('cart', JSON.stringify(cart));
+            setLocalStorage('products', products);
+            setLocalStorage('users', users);
+            setLocalStorage('orders', orders);
+            setLocalStorage('currentUser', currentUser);
+            
+            // Salvar carrinho com chave específica para o usuário
+            if (currentUser) {
+                setLocalStorage(`cart_${currentUser.id}`, userCart);
+            } else {
+                setLocalStorage('cart', userCart);
+            }
         }
         
         // Atualizar estatísticas
@@ -1373,11 +1395,11 @@
         function addToCart(productId) {
             const product = products.find(p => p.id === productId);
             if (product) {
-                const existingItem = cart.find(item => item.productId === productId);
+                const existingItem = userCart.find(item => item.productId === productId);
                 if (existingItem) {
                     existingItem.quantity += 1;
                 } else {
-                    cart.push({
+                    userCart.push({
                         productId: productId,
                         name: product.name,
                         price: product.price,
@@ -1405,12 +1427,12 @@
             cartItems.innerHTML = '';
             let total = 0;
             
-            if (cart.length === 0) {
+            if (userCart.length === 0) {
                 cartItems.innerHTML = '<p class="text-center">Seu carrinho está vazio.</p>';
                 checkoutBtn.disabled = true;
             } else {
                 checkoutBtn.disabled = false;
-                cart.forEach(item => {
+                userCart.forEach(item => {
                     const itemTotal = item.price * item.quantity;
                     total += itemTotal;
                     
@@ -1469,7 +1491,7 @@
         
         // Atualizar quantidade do item no carrinho
         function updateQuantity(productId, change) {
-            const item = cart.find(item => item.productId === productId);
+            const item = userCart.find(item => item.productId === productId);
             if (item) {
                 item.quantity += change;
                 
@@ -1486,9 +1508,9 @@
         // Remover produto do carrinho
         function removeFromCart(productId) {
             if (confirm('Tem certeza que deseja remover este item do carrinho?')) {
-                const itemIndex = cart.findIndex(item => item.productId === productId);
+                const itemIndex = userCart.findIndex(item => item.productId === productId);
                 if (itemIndex !== -1) {
-                    cart.splice(itemIndex, 1);
+                    userCart.splice(itemIndex, 1);
                     updateLocalStorage();
                     updateCart();
                 }
@@ -1497,7 +1519,7 @@
         
         // Finalizar pedido
         function checkout() {
-            if (cart.length === 0) {
+            if (userCart.length === 0) {
                 alert('Seu carrinho está vazio!');
                 return;
             }
@@ -1508,13 +1530,13 @@
                 return;
             }
             
-            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const total = userCart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             const newOrder = {
                 id: orders.length > 0 ? Math.max(...orders.map(o => o.id)) + 1 : 1,
                 userId: currentUser.id,
                 userName: currentUser.name,
                 userPhone: currentUser.phone,
-                items: [...cart],
+                items: [...userCart],
                 total: total,
                 status: 'pending',
                 date: new Date().toISOString(),
@@ -1522,7 +1544,7 @@
             };
             
             orders.push(newOrder);
-            cart = [];
+            userCart = [];
             updateLocalStorage();
             updateCart();
             updateStats();
@@ -1916,6 +1938,8 @@
                     email: email,
                     isAdmin: true
                 };
+                // Carregar carrinho específico para este usuário
+                userCart = getLocalStorage(`cart_${currentUser.id}`) || [];
                 updateLocalStorage();
                 updateUserInterface();
                 alert('Login administrativo realizado com sucesso!');
@@ -1926,6 +1950,8 @@
             const user = users.find(u => u.email === email && u.password === password);
             if (user) {
                 currentUser = user;
+                // Carregar carrinho específico para este usuário
+                userCart = getLocalStorage(`cart_${currentUser.id}`) || [];
                 updateLocalStorage();
                 updateUserInterface();
                 alert('Login realizado com sucesso!');
@@ -1957,6 +1983,8 @@
             
             users.push(newUser);
             currentUser = newUser;
+            // Inicializar carrinho vazio para o novo usuário
+            userCart = [];
             updateLocalStorage();
             updateUserInterface();
             updateStats();
@@ -1965,6 +1993,8 @@
         
         logoutBtn.addEventListener('click', () => {
             currentUser = null;
+            // Limpar carrinho ao fazer logout
+            userCart = [];
             updateLocalStorage();
             updateUserInterface();
             alert('Logout realizado com sucesso!');
